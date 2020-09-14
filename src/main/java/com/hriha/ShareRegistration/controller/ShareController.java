@@ -5,8 +5,12 @@ import com.hriha.ShareRegistration.domain.Share;
 import com.hriha.ShareRegistration.service.ShareService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,9 +25,14 @@ public class ShareController {
         this.shareService = shareService;
     }
 
-    @GetMapping
-    public List<Share> list() {
-        return shareService.getAll();
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Share>> list() {
+        List<Share> shares= shareService.getAll();
+
+        if (shares.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(shares,HttpStatus.OK);
     }
 
     @GetMapping("{id}")
