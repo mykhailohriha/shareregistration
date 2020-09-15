@@ -1,6 +1,6 @@
 function getIndex(list, id) {
     for (var i = 0; i < list.length; i++) {
-        if(list[i].id === id) {
+        if (list[i].id === id) {
             return i;
         }
     }
@@ -11,7 +11,7 @@ function getIndex(list, id) {
 var messageApi = Vue.resource('/api/v1/share{/id}');
 
 Vue.component('share-form', {
-    props: ['shares','shareAttr'],
+    props: ['shares', 'shareAttr'],
     data: function () {
         return {
             comment: '',
@@ -19,7 +19,7 @@ Vue.component('share-form', {
         }
     },
     watch: {
-        shareAttr: function(newVal, oldVal) {
+        shareAttr: function (newVal, oldVal) {
             this.comment = newVal.comment;
             this.id = newVal.id;
         }
@@ -33,15 +33,15 @@ Vue.component('share-form', {
         save: function () {
             var share = {comment: this.comment};
 
-            if(this.id) {
+            if (this.id) {
                 messageApi.update({id: this.id}, share).then(result =>
-                    result.json().then(data=>{
-                        var index = getIndex(this.shares,data.id)
+                    result.json().then(data => {
+                        var index = getIndex(this.shares, data.id)
                         this.shares.splice(index, 1, data);
                         this.comment = '';
                         this.id = ''
                     }))
-            } else{
+            } else {
                 messageApi.save({}, share).then(result =>
                     result.json().then(data => {
                         this.shares.push(data);
@@ -54,7 +54,7 @@ Vue.component('share-form', {
 });
 
 Vue.component('share-row', {
-    props: ['share','editMethod','shares'],
+    props: ['share', 'editMethod', 'shares'],
     template: '<div><i>({{ share.id }})</i>{{ share.comment }}' +
         '<span style="position: absolute; right: 0">' +
         '<input type="button" value="Edit" @click="edit"/>' +
@@ -78,7 +78,7 @@ Vue.component('share-row', {
 
 Vue.component('shares-list', {
     props: ['shares'],
-    data: function(){
+    data: function () {
         return {
             share: null
         }
@@ -86,7 +86,7 @@ Vue.component('shares-list', {
     template:
         '<div style="position: relative; width: 300px;">' +
         '<share-form :shares="shares" :shareAttr="share"/>' +
-        '<share-row v-for="share in shares" :key="share.id" :share="share"'+
+        '<share-row v-for="share in shares" :key="share.id" :share="share"' +
         ':editMethod="editMethod" :shares="shares"/>' +
         '</div>',
     created: function () {

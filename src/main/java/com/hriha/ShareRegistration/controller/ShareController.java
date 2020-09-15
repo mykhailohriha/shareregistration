@@ -3,14 +3,13 @@ package com.hriha.ShareRegistration.controller;
 
 import com.hriha.ShareRegistration.domain.Share;
 import com.hriha.ShareRegistration.service.ShareService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,40 +25,69 @@ public class ShareController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Share>> list() {
-        List<Share> shares= shareService.getAll();
+    public ResponseEntity<List<Share>> getAllShares() {
+        List<Share> shares = shareService.getAll();
 
         if (shares.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(shares,HttpStatus.OK);
+        return new ResponseEntity<>(shares, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public Share getOne(@PathVariable("id") Share share) {
-        return share;
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Share> getShare(@PathVariable("id") Long shareId) {
+        if (shareId == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Share share = shareService.getById(shareId);
+
+        if (share == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(share, HttpStatus.OK);
     }
 
-    @PostMapping
-    public Share create(@RequestBody Share share) {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Share> saveShare(@RequestBody Share share) {
+        HttpHeaders headers = new HttpHeaders();
+
+        if (share == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        shareService.save(share);
         share.setCreationDate(LocalDateTime.now());
-        return shareService.save(share);
+
+        return new ResponseEntity<>(share, headers, HttpStatus.CREATED);
     }
 
-    @PutMapping("{id}")
-    public Share update(
-            @PathVariable("id") Share shareFromDb,
-            @RequestBody Share share) {
-        BeanUtils.copyProperties(share, shareFromDb, "id");
+    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Share> update(@RequestBody Share share) {
+        HttpHeaders headers = new HttpHeaders();
 
-        return shareService.save(shareFromDb);
+        if (share == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        shareService.save(share);
+
+        return new ResponseEntity<>(share,headers,HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
-    public void delete(@PathVariable("id") Share share) {
-        shareService.delete(share);
-    }
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Share> delete(@PathVariable("id") Long id) {
+        Share share = shareService.getById(id);
 
+        if (share == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        shareService.deleteById(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 
 }
