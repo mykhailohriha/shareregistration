@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,9 +57,7 @@ public class ShareController {
         if (share == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         shareService.save(share);
-        share.setCreationDate(LocalDateTime.now());
 
         return new ResponseEntity<>(share, headers, HttpStatus.CREATED);
     }
