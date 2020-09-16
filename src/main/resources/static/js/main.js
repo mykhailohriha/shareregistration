@@ -15,23 +15,36 @@ Vue.component('share-form', {
     data: function () {
         return {
             comment: '',
-            id: ''
+            id: '',
+            status: '',
+            edrpou: '',
+            quantity: '',
+            value: '',
         }
     },
     watch: {
         shareAttr: function (newVal, oldVal) {
             this.comment = newVal.comment;
+            this.status = newVal.status;
             this.id = newVal.id;
+            this.edrpou = newVal.edrpou;
+            this.quantity = newVal.quantity;
+            this.value = newVal.value;
         }
     },
     template:
         '<div>' +
-        '<input type ="text" placeholder="Write something"  v-model="comment"/>' +
+        '<input type ="text" placeholder="Write comment..."  v-model="comment"/>' +
+        '<input type ="text" placeholder="Write status..."  v-model="status"/>' +
+        '<input type ="text" placeholder="Write EDRPOU..."  v-model="edrpou"/>' +
+        '<input type ="text" placeholder="Write quantity..."  v-model="quantity"/>' +
+        '<input type ="text" placeholder="Write value..."  v-model="value"/>' +
         '<input type ="button" value="Save" @click="save" />' +
         '</div>',
     methods: {
         save: function () {
-            var share = {comment: this.comment};
+            var share = {comment: this.comment, status: this.status, edrpou: this.edrpou, quantity: this.quantity,
+            value: this.value};
 
             if (this.id) {
                 messageApi.update({id: this.id}, share).then(result =>
@@ -39,13 +52,21 @@ Vue.component('share-form', {
                         var index = getIndex(this.shares, data.id)
                         this.shares.splice(index, 1, data);
                         this.comment = '';
-                        this.id = ''
+                        this.status = '';
+                        this.edrpou = '';
+                        this.id = '';
+                        this.quantity = '';
+                        this.value = '';
                     }))
             } else {
                 messageApi.save({}, share).then(result =>
                     result.json().then(data => {
                         this.shares.push(data);
                         this.comment = '';
+                        this.status = '';
+                        this.edrpou = '';
+                        this.quantity = '';
+                        this.value = '';
                     })
                 )
             }
@@ -55,7 +76,8 @@ Vue.component('share-form', {
 
 Vue.component('share-row', {
     props: ['share', 'editMethod', 'shares'],
-    template: '<div><i>({{ share.id }})</i>{{ share.comment }}' +
+    template: '<div><i>({{ share.id }})</i>Comment: {{ share.comment }} Status: {{share.status}} EDRPOU: {{share.edrpou}} ' +
+        'quantity: {{share.quantity}} value: {{share.value}} total value:{{share.totalValue}} creation date:{{share.creationDate}}'+
         '<span style="position: absolute; right: 0">' +
         '<input type="button" value="Edit" @click="edit"/>' +
         '<input type="button" value="X" @click="del"/>' +
@@ -84,7 +106,7 @@ Vue.component('shares-list', {
         }
     },
     template:
-        '<div style="position: relative; width: 300px;">' +
+        '<div style="position: relative; width: 800px;">' +
         '<share-form :shares="shares" :shareAttr="share"/>' +
         '<share-row v-for="share in shares" :key="share.id" :share="share"' +
         ':editMethod="editMethod" :shares="shares"/>' +
